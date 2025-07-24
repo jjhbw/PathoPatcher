@@ -356,10 +356,10 @@ def compute_interesting_patches(
     # Get the tile
     # get_thumbnail returns a PIL image with (width, height)
     # while np array use (height=rows,width=columns)
-    full_tile = np.array(
-        slide.get_thumbnail(tiles.level_dimensions[largest_single_level]),
-        dtype=np.uint8,
+    full_tile_rgba = slide.read_region(
+        (0, 0), largest_single_level, tiles.level_dimensions[largest_single_level]
     )
+    full_tile = np.array(full_tile_rgba.convert("RGB"), dtype=np.uint8)
     diff_height = abs(
         full_tile.shape[0] - tiles.level_dimensions[largest_single_level][1]
     )
