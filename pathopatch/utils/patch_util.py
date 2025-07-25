@@ -356,10 +356,18 @@ def compute_interesting_patches(
     # Get the tile
     # get_thumbnail returns a PIL image with (width, height)
     # while np array use (height=rows,width=columns)
-    full_tile_rgba = slide.read_region(
-        (0, 0), largest_single_level, tiles.level_dimensions[largest_single_level]
+    target_size = tiles.level_dimensions[largest_single_level]
+    slide_w, slide_h = slide.dimensions
+    downsample = max(slide_w / target_size[0], slide_h / target_size[1])
+    best_level = slide.get_best_level_for_downsample(downsample)
+    level_dims = slide.level_dimensions[best_level]
+    region = slide.read_region((0, 0), best_level, level_dims)
+    # TODO: REMOVEME DEBUG
+    region.save('image.png')
+    full_tile = np.array(
+        region.convert("RGB"),
+        dtype=np.uint8,
     )
-    full_tile = np.array(full_tile_rgba.convert("RGB"), dtype=np.uint8)
     diff_height = abs(
         full_tile.shape[0] - tiles.level_dimensions[largest_single_level][1]
     )
